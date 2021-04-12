@@ -49,7 +49,6 @@ const inquirerMenu = async() => {
     const { opcion } = await inquirer.prompt(preguntas);
     
     return opcion;
-    
 }
 
 leerInput = async(message) => {
@@ -88,8 +87,103 @@ const pausa = async() => {
     return opcion;
 }
 
+const listadoTareasBorrar = async(tareas = []) => {
+    console.clear();
+    const pregs = [
+        {
+            type: 'list',
+            name: 'id',
+            message: 'Seleccione la tarea a eliminar',
+            choices: []
+        }
+    ];
+
+    let idx = 0;
+    /*tareas.forEach((tarea) => {
+        pregs[0].choices.push({
+            value: tarea.id,
+            name: `${ ++idx }- `.bold.blue + tarea.display()
+        });
+    });*/
+
+    pregs[0].choices = tareas.map(tarea => {
+        return {
+            value: tarea.id,
+            name: `${ ++idx }- `.bold.blue + tarea.display()
+        };
+    });
+
+    pregs[0].choices.push({
+        value: '0',
+        name: `${ ++idx }- `.bold.blue + 'Cancelar'.bold
+    });
+
+    const { id } = await inquirer.prompt(pregs);
+
+    return id;
+}
+
+const listadoTareasCompletar = async(tareas = []) => {
+    console.clear();
+    const pregs = [
+        {
+            type: 'checkbox',
+            name: 'ids',
+            message: 'Seleccione la/s tarea/s a completar',
+            choices: []
+        }
+    ];
+
+    
+    let idx = 0;
+    tareas.forEach((tarea) => {
+        if (tarea.completaEn == null) {
+            pregs[0].choices.push({
+                value: tarea.id,
+                name: `${ ++idx }- `.bold.blue + tarea.display()
+            });
+        }
+    });
+
+    pregs[0].choices.push({
+        value: '0',
+        name: `${ ++idx }- `.bold.blue + 'Cancelar'.bold
+    });
+
+    const { ids } = await inquirer.prompt(pregs);
+
+    let cancel = false;
+    ids.forEach(id => {
+        if (id == '0') {
+            cancel = true;
+        }
+    });
+
+    if (cancel)
+        return [];
+
+    return ids;
+}
+
+confirm = async(message) => {
+    const question = [
+        {
+            type: 'confirm',
+            name: 'ok',
+            message
+        }
+    ];
+
+    const { ok } = await inquirer.prompt(question);
+
+    return ok;
+}
+
 module.exports = {
     inquirerMenu,
     pausa,
-    leerInput
+    leerInput,
+    listadoTareasBorrar,
+    listadoTareasCompletar,
+    confirm
 }
